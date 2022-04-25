@@ -25,6 +25,9 @@ const ScheduleSchema = new mongoose.Schema(
     endTime: {
       type: Date,
     },
+    offset:{
+      type:Number
+    }
   },
   {
     timestamps: true,

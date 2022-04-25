@@ -1,6 +1,5 @@
 const UserModel = require("../models/User.model");
 const userIdConverter = async (req, res, next) => {
-  console.log("middleware");
   if (req.body.userId) {
     const user = await UserModel.findOne({ userId: req.body.userId });
     if (user) {
@@ -26,7 +25,7 @@ const userIdConverter = async (req, res, next) => {
       }
     }
     req.body.guestUserIds = convertedGuestList;
-    console.log(req.body.formatted,"middle");
+    // console.log(req.body.formatted,"middle");
     // next();
   }
   next();
