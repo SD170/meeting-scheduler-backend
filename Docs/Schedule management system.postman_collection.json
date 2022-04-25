@@ -1,0 +1,180 @@
+{
+	"info": {
+		"_postman_id": "e7cbdff4-0d89-4b0b-8eb5-eca462f7be57",
+		"name": "Schedule management system",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "Create user",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/api/v1/users",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users"
+							]
+						},
+						"description": "Creates user and returns the userId.\n\nYou don't have to pass anything to this endpoint. The userId is generated automatically in an incrementing order."
+					},
+					"response": []
+				},
+				{
+					"name": "List users",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/api/v1/users",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users"
+							]
+						},
+						"description": "List all the available users."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Schedule meeting",
+			"item": [
+				{
+					"name": "Create meeting",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"userId\":\"U5\",\n    \"roomId\":\"R3\",\n    \"guestUsers\":[\"U2\", \"U4\"],\n    \"meetingDate\":\"2022-04-25\",\n    \"startTime\":\"12:30\",\n    \"endTime\":\"12:35\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/v1/schedule",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"schedule"
+							]
+						},
+						"description": "Create a schedule meeting.\n\nfields:-\n\nuserId: The userId of the **Host user**,\n\nroomId: The roomId. Must be one of **\\[\"R1\", \"R2\", \"R3\", \"R4\", \"R5\"\\]**, We can **add more** room in /utils/RoomList.js.\n\nguestUsers: An **array** of the userIds of the **guests**.\n\nmeetingDate: Date of the meeting in **YYYY-MM-DD** format\n\nstartTime: Start time of the meeting in **HH:MM** format.\n\nendTime: End time of the meeting in **HH:MM** format."
+					},
+					"response": []
+				},
+				{
+					"name": "List meeting schedule for user",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/api/v1/schedule/byUser?userId=U1",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"schedule",
+								"byUser"
+							],
+							"query": [
+								{
+									"key": "userId",
+									"value": "U1"
+								}
+							]
+						},
+						"description": "List all the meeting a user has.\n\nPass the user id in the query params, with key **userId**."
+					},
+					"response": []
+				},
+				{
+					"name": "List meeting schedule for room",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/api/v1/schedule/byRoom?roomId=R2",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"schedule",
+								"byRoom"
+							],
+							"query": [
+								{
+									"key": "roomId",
+									"value": "R2"
+								}
+							]
+						},
+						"description": "List all the meeting a room has.\n\nPass the room id in the query params, with key **roomId**."
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "url",
+			"value": "http://localhost:5000",
+			"type": "string"
+		}
+	]
+}
