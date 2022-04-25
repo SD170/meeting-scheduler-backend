@@ -1,9 +1,15 @@
 const UserModel = require("../models/User.model");
+/**
+ * middleware to convert userId to mongo _id.
+ */
 const userIdConverter = async (req, res, next) => {
-  if (req.body.userId) {
-    const user = await UserModel.findOne({ userId: req.body.userId });
+  // console.log(req.query);
+  if (req.body.userId || req.query.userId) {
+    const userId = req.body.userId ? req.body.userId : req.query.userId;
+    const user = await UserModel.findOne({ userId });
     if (user) {
       req.body.userId = user._id;
+      req.query.userId = user._id;
     } else {
       res.status(404).json({
         success: false,

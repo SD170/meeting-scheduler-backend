@@ -5,7 +5,8 @@ const { RoomList } = require("../utils/RoomList");
 const {
   checkUserAvailability,
   checkRoomAvailability,
-  checkUserAndRoomAvailability,
+  formatScheduleDates,
+  formatUserIds,
 } = require("../utils/Helper");
 
 //  @desc       create a meeting
@@ -26,7 +27,6 @@ exports.createSchedule = asyncHandler(async (req, res, next) => {
     if (userId && roomId && meetingDate && startTime && endTime) {
       // checking if the roomId actually exists
       if (RoomList.indexOf(roomId) !== -1) {
-        // console.log(req.body);
         const formattedMeetingDate = new Date(meetingDate);
         const formattedStartTime = new Date(meetingDate + "T" + startTime);
         const formattedEndTime = new Date(meetingDate + "T" + endTime);
@@ -54,12 +54,24 @@ exports.createSchedule = asyncHandler(async (req, res, next) => {
              * Checking if the guests are free or not
              */
             for (let i = 0; i < guestUserIds.length; i++) {
+              /**
+               * Host can't be inside guest array
+               */
+              if(guestUserIds[i].toString() === userId.toString()){
+                return res.status(400).json({
+                  success: false,
+                  message: `host can't be inside guest array`,
+                });
+              }
               const isGuestAvailable = await checkUserAvailability(
                 guestUserIds[i],
                 formattedMeetingDate,
                 formattedStartTime,
                 formattedEndTime
               );
+              /**
+               * guest is not free
+               */
               if (!isGuestAvailable) {
                 return res.status(400).json({
                   success: false,
@@ -67,17 +79,6 @@ exports.createSchedule = asyncHandler(async (req, res, next) => {
                 });
               }
             }
-
-            // console.log(result);
-            // const formattedRes = result.map((r)=>{
-            //   r.meetingDate = new Date( r.meetingDate.getTime() -  ( r.offset * 60000 ) )
-            //   r.startTime = new Date( r.startTime.getTime() -  ( r.offset * 60000 ) )
-            //   r.endTime = new Date( r.endTime.getTime() -  ( r.offset * 60000 ) )
-
-            //   return r;
-            // })
-            // console.log(formattedRes);
-            // console.log(result.length);
 
             /**
              * Creating the meeting
@@ -100,24 +101,18 @@ exports.createSchedule = asyncHandler(async (req, res, next) => {
              * Refactoring the timezone for the client
              * https://www.mongodb.com/docs/v3.2/tutorial/model-time-data/
              */
-            savedSchedule.meetingDate = new Date(
-              savedSchedule.meetingDate.getTime() - savedSchedule.offset * 60000
-            );
-            savedSchedule.startTime = new Date(
-              savedSchedule.startTime.getTime() - savedSchedule.offset * 60000
-            );
-            savedSchedule.endTime = new Date(
-              savedSchedule.endTime.getTime() - savedSchedule.offset * 60000
-            );
+
+            // formatting the time with client time
+            const formattedDateMeeting = formatScheduleDates(savedSchedule);
+
+            // formatting the _id's userId
+            const formattedIdMeeting = await formatUserIds(formattedDateMeeting);
 
             res.status(200).json({
               success: true,
-              data: {
-                savedSchedule,
-              },
+              data: formattedIdMeeting,
             });
 
-            // res.send("ss");
           } else {
             return res.status(400).json({
               success: false,
@@ -134,10 +129,6 @@ exports.createSchedule = asyncHandler(async (req, res, next) => {
         return res.status(400).json({
           success: false,
           message: "No such roomId exists",
-          // data: {
-          //   id: savedSchedule._id,
-          //   userId: savedSchedule.userId,
-          // },
         });
       }
     } else {
@@ -145,10 +136,6 @@ exports.createSchedule = asyncHandler(async (req, res, next) => {
         success: false,
         message:
           "Please provide a hostUserId, roomId, meetingDate, startTime, endTime",
-        // data: {
-        //   id: savedSchedule._id,
-        //   userId: savedSchedule.userId,
-        // },
       });
     }
   } catch (err) {
@@ -157,16 +144,93 @@ exports.createSchedule = asyncHandler(async (req, res, next) => {
   }
 });
 
-//  @desc       list users
-//  @route      get /api/v1/users
+//  @desc       list meeting schedule by user
+//  @route      GET /api/v1/schedule/byUser
 //  @access     Public
-exports.listUsers = asyncHandler(async (req, res, next) => {
+exports.listScheduleForUser = asyncHandler(async (req, res, next) => {
   try {
-    const userList = await UserModel.find().select(["-__v"]);
-    res.status(200).json({
-      success: true,
-      data: userList,
-    });
+    const { userId } = req.query;
+    if (userId) {
+      /**
+       * Searh meetings for guests and hosts
+       */
+      const meetings = await ScheduleModel.find({
+        $or: [
+          {
+            hostUserId: userId,
+          },
+          {
+            guestUsers: { $in: [userId] },
+          },
+        ],
+      }).sort("meetingDate startTime");
+
+      /**
+       * Format dates
+       */
+      const formattedDateMeetings = meetings.map((meeting) =>
+        formatScheduleDates(meeting)
+      );
+      /**
+       * Format ids
+       */
+      const formattedIdMeetings = [];
+      for (let i = 0; i < formattedDateMeetings.length; i++) {
+        const meeting = await formatUserIds(formattedDateMeetings[i]);
+        formattedIdMeetings.push(meeting);
+      }
+
+      res.status(200).json({
+        success: true,
+        data: formattedIdMeetings,
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        message: "send userId in query param",
+      });
+    }
+  } catch (err) {
+    return next(err);
+  }
+});
+
+//  @desc       list meeting schedule by roomId
+//  @route      GET /api/v1/schedule/byRoom
+//  @access     Public
+exports.listScheduleForRoom = asyncHandler(async (req, res, next) => {
+  try {
+    const { roomId } = req.query;
+    if (roomId && RoomList.indexOf(roomId) !== -1) {
+      const meetings = await ScheduleModel.find({
+        roomId,
+      }).sort("meetingDate startTime");
+
+      /**
+       * Format dates
+       */
+      const formattedDateMeetings = meetings.map((meeting) =>
+        formatScheduleDates(meeting)
+      );
+      /**
+       * Format ids
+       */
+      const formattedIdMeetings = [];
+      for (let i = 0; i < formattedDateMeetings.length; i++) {
+        const meeting = await formatUserIds(formattedDateMeetings[i]);
+        formattedIdMeetings.push(meeting);
+      }
+
+      res.status(200).json({
+        success: true,
+        data: formattedIdMeetings,
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        message: "send a valid roomID in query params",
+      });
+    }
   } catch (err) {
     return next(err);
   }
