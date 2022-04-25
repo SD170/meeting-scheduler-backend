@@ -8,8 +8,12 @@ dotenv.config({path: './config/config.env'});
 //Connect to database
 connectDB();
 
+// // setting the default time zone
+// process.env.TZ = "Asia/Calcutta";
+
 //route files
 const userRoutes = require('./routes/user.routes');
+const scheduleRoutes = require('./routes/schedule.routes');
 
 const app = express();
 
@@ -19,6 +23,7 @@ app.use(express.json());
 
 //mount routers
 app.use('/api/v1/users',userRoutes);
+app.use('/api/v1/schedule',scheduleRoutes);
 
 
 const PORT = process.env.PORT || 5000;

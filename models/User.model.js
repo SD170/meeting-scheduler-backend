@@ -14,7 +14,9 @@ UserSchema.pre("save", function (next) {
     if (err) {
       return next(err);
     }
-    self.userId = `R${count+1}`;
+    self.userId = `U${count+1}`;
+    // self._id=`U${count+1}`
+    // console.log(self._id);
     next();
   });
   // next();
