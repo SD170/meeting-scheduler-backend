@@ -8,7 +8,7 @@ The project is on a meeting scheduling management system. There can be multiple 
 ## Installation
 
 #### 1) Clone the repository:
-    git clone <>
+    git clone https://github.com/SD170/meeting-scheduler-backend
 #### 2) Install all the dependencies:
 On the project root folder, run:
     
@@ -44,7 +44,7 @@ From the root folder, start the project by running:
 
 In case you have Postman installed, you can import the endpoints **with documentation** inside
 `Docs/Schedule management system.postman_collection.json`
-or click [here]() <>.
+or click [here](https://github.com/SD170/meeting-scheduler-backend/blob/master/Docs/Schedule%20management%20system.postman_collection.json).
 
 Otherwise I'm adding the endpoints with brief description.
 
@@ -104,7 +104,7 @@ Our schedule management system backend has the following tech stack.
 - [Git](https://git-scm.com) - For source control.
 
 ## Docs
-To view the doc where we've elaborated on the design pattern and features, you can go to **/Docs/description** <> or click [here]()<>
+To view the doc where we've elaborated on the design pattern and features, you can go to **/Docs/description.pdf** or click [here](https://github.com/SD170/meeting-scheduler-backend/blob/master/Docs/description.pdf)
 
 ## Conclusion
 For perfectly saving the date/time irrespective of the timezone inside the DB (mongoDB), we've followed, 
