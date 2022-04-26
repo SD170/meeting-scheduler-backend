@@ -70,10 +70,15 @@ Create a schedule meeting.
 ###### Body:
 _**userId**_: The userId of the **Host user**,
 _**roomId**_: The roomId. Must be one of **["R1", "R2", "R3", "R4", "R5"]**, We can add more room in **/utils/RoomList.js**.
+
 _**guestUsers**_: An **array** of the userIds of the **guests(userId)**.
+
 _**meetingDate**_: Date of the meeting in **YYYY-MM-DD** format
+
 _**startTime**_: Start time of the meeting in **HH:MM** format.
+
 _**endTime**_: End time of the meeting in **HH:MM** format.
+
 ###### Query-params:
 *Empty*
 ****
