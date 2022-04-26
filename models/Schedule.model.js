@@ -18,12 +18,15 @@ const ScheduleSchema = new mongoose.Schema(
     },
     meetingDate: {
       type: Date,
+      required: [true, "Please add a meeting date"],
     },
     startTime: {
       type: Date,
+      required: [true, "Please add start time"],
     },
     endTime: {
       type: Date,
+      required: [true, "Please add end time"],
     },
     offset:{
       type:Number

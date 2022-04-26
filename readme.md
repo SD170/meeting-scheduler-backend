@@ -13,7 +13,19 @@ The project is on a meeting scheduling management system. There can be multiple 
 On the project root folder, run:
     
     npm install
-#### 3) Add a config.env file:
+#### 3) Start the MongoDB in your os:
+Run mongDB as a service, and make sure to know the port no (27017 by default).
+For Ubuntu (in my case) to start mongodb as a service run these following commands in a terminal:
+```
+sudo service mongod start
+```
+after that:
+```
+mongo
+```
+this will start the service. So, let it keep running.
+
+#### 4) Add a config.env file:
 We have used mongoDB as our database. So, in order to connect to the local database, we'll need 3 values, and we've kept it in **config.env** in tha path-  **/config**:
     
 - Create a file named **config.env** inside the folder, **/config**.
@@ -23,7 +35,7 @@ We have used mongoDB as our database. So, in order to connect to the local datab
     MONGOPORT=27017
     DATABASENAME=<Your DB name>
     ```
-#### 4) Start the project:
+#### 5) Start the project:
 From the root folder, start the project by running:
    
     npm start
@@ -96,7 +108,7 @@ To view the doc where we've elaborated on the design pattern and features, you c
 
 ## Conclusion
 For perfectly saving the date/time irrespective of the timezone inside the DB (mongoDB), we've followed, 
-` https://www.mongodb.com/docs/v3.2/tutorial/model-time-data/`
+`https://www.mongodb.com/docs/v3.2/tutorial/model-time-data/`
 
 As MongoDB saved all the time in UTC format, we've converted to the runtime(node.js) timezone while data retrieval for a better user experience.
 We can change the timezone from the runtime to specific user/clients also, the code is flexible enough.
